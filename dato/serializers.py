@@ -24,8 +24,8 @@ class DatosSerializer(serializers.ModelSerializer):
         return instance
 
 class CaracteristicasSerializer(serializers.Serializer):
-    latitud = serializers.DecimalField(max_digits=12, decimal_places=7, default=0)
-    longitud = serializers.DecimalField(max_digits=12, decimal_places=7, default=0)
+    latitud = serializers.DecimalField(max_digits=10, decimal_places=7, default=0)
+    longitud = serializers.DecimalField(max_digits=10, decimal_places=7, default=0)
     calidad = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
     hora = serializers.TimeField()
     humedad = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
