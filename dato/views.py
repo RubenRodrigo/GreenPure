@@ -9,6 +9,8 @@ from .models import Datos
 from .serializers import *
 from .resumen import *
 from .clases import *
+#Variable de la IP de la API a consumir
+API = "http://54.157.137.57/" 
 
 class JSONResponse(HttpResponse):
     """
@@ -18,33 +20,6 @@ class JSONResponse(HttpResponse):
         content = JSONRenderer().render(data)
         kwargs['content_type'] = 'application/json'
         super(JSONResponse, self).__init__(content, **kwargs)
-
-class DatoResumido:
-    def __init__(self, id, fecha, pais, ciudad, calidadAVG, ubicaciones):
-        self.id = id
-        self.fecha = fecha
-        self.pais = pais
-        self.ciudad = ciudad
-        self.calidadAVG = calidadAVG
-        self.ubicaciones = ubicaciones
-
-class ElementoResumido:
-    def __init__(self, distrito, datos):
-        self.distrito = distrito
-        self.datos = datos
-
-class CaracteristicasElemento:
-    def __init__(self, latitud, longitud, calidad, hora, humedad, temperatura, calor, concentracion, sensorHumo, sensorMetano):
-        self.latitud = latitud
-        self.longitud = longitud
-        self.calidad = calidad
-        self.hora = hora
-        self.humedad = humedad
-        self.temperatura = temperatura
-        self.calor = calor
-        self.concentracion = concentracion
-        self.sensorHumo = sensorHumo
-        self.sensorMetano = sensorMetano
 
 @csrf_exempt
 def Datos_list(request):
@@ -137,6 +112,17 @@ def resumen(request):
             resumenFinal = correccionOrientacionResumen(datosResumidos, paisesCiudades, distritos)
     #Serialización de datos
     serializer = DatosResumenSerializer(resumenFinal, many=True)
+    return JSONResponse(serializer.data)
+
+def ciudades(request):
+    ciudadesLista = []
+    response = requests.get(API+"resumen", params={})
+    if response.status_code == 200:
+        response = response.json()
+    for item in response:
+        ciudad = Ciudad(item['id'], item['ciudad'])
+        ciudadesLista.append(ciudad)
+    serializer = CiudadesSerializer(ciudadesLista, many=True)
     return JSONResponse(serializer.data)
 
 def humedad(request):

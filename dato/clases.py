@@ -23,6 +23,12 @@ class CaracteristicasElemento:
         self.concentracion = concentracion
         self.sensorHumo = sensorHumo
         self.sensorMetano = sensorMetano
+    
+#Clase para funcionalidad Paises
+class Ciudad:
+    def __init__(self, idCiudad, nombre):
+        self.idCiudad = idCiudad
+        self.nombre = nombre
 
 #Clase para funcionalidad con Arduino
 class DatoCalidad:

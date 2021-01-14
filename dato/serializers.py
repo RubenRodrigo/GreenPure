@@ -50,3 +50,7 @@ class DatosResumenSerializer(serializers.Serializer):
     ubicaciones = serializers.ListField(
         child=ElementosSerializer()
     )
+
+class CiudadesSerializer(serializers.Serializer):
+    idCiudad = serializers.IntegerField()
+    nombre = serializers.CharField(max_length=100)
