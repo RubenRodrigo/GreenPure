@@ -70,46 +70,42 @@ def resumen(request):
     datosResumidos = []
     elementosDato = []
     caracteristicas = []
-    resumenParcial = []
     resumenFinal = []
     #Listas para guardar variables de orientación de datos
     distritos = []
     paisesCiudades = []
+    datosDistrito = []
+    repetidos = []
     #Variable contador
     cont = 0
     for dato in datos:  
         cont = cont+1
-        #Primer nivel de datos
-        fecha = str(dato.fecha)[:10]
+        #Datos de ubicación
         geolocator = Nominatim(user_agent="GreenPure")
         location = geolocator.reverse(str(dato.Latitud) + "," + str(dato.Longitud))
         pais = obtenerPais(location, cont)
         ciudad = obtenerCiudad(location, cont)
-        paisesCiudades.append(pais+ciudad)
-        #Segundo nivel de datos
         distrito = obtenerDistrito(location, cont)
-        distritos.append(distrito)
-        #Tercer nivel de datos
-        calidad = 12
-        hora = str(dato.fecha)[11:19]
-        humedad = dato.Humedad
-        temperatura = dato.Temperatura
-        calor = dato.Calor
-        concentracion = dato.Concentracion
-        sensorHumo = dato.SensorHumo
-        sensorMetano = dato.SensorMetano
+        datosDistrito.append(distrito)
         #Arreglo con el resumen
         #Tercer nivel
-        caracteristicasElemento = CaracteristicasElemento(dato.Latitud, dato.Longitud, calidad, hora, humedad, temperatura, calor, concentracion, sensorHumo, sensorMetano)
+        caracteristicasElemento = CaracteristicasElemento(dato.Latitud, dato.Longitud, 12, str(dato.fecha)[11:19], dato.Humedad, dato.Temperatura, dato.Calor, dato.Concentracion, dato.SensorHumo, dato.SensorMetano)
         caracteristicas.append(caracteristicasElemento)
         #Segundo nivel
+        if distrito in repetidos:
+            continue
         elementoResumido = ElementoResumido(cont, distrito, caracteristicas)
         elementosDato.append(elementoResumido)
+        repetidos.append(distrito)
+        distritos.append(distrito)
+        paisesCiudades.append(pais+ciudad)
         #Primer nivel
-        datoResumido = DatoResumido(cont, fecha, pais, ciudad, 24, elementosDato)
+        if pais+ciudad in repetidos:
+            continue
+        datoResumido = DatoResumido(cont, str(dato.fecha)[:10], pais, ciudad, 24, elementosDato)
         datosResumidos.append(datoResumido)
-        if cont==len(datos):
-            resumenFinal = correccionOrientacionResumen(datosResumidos, paisesCiudades, distritos)
+        repetidos.append(pais+ciudad)
+    resumenFinal = correccionOrientacionResumen(datosResumidos, paisesCiudades, distritos, datosDistrito)
     #Serialización de datos
     serializer = DatosResumenSerializer(resumenFinal, many=True)
     return JSONResponse(serializer.data)
@@ -125,7 +121,7 @@ def ciudades(request):
     serializer = CiudadesSerializer(ciudadesLista, many=True)
     return JSONResponse(serializer.data)
 
-def distrito(request, pk):
+def ciudad(request, pk):
     response = requests.get(API+"resumen", params={})
     if response.status_code == 200:
         response = response.json()
@@ -137,6 +133,17 @@ def distrito(request, pk):
                 distritos.append(distritoAuxiliar)
             ciudadDistritos = CiudadDistritos(item['id'], item['ciudad'],distritos)
     serializer = CiudadesDistritosSerializer(ciudadDistritos)
+    return JSONResponse(serializer.data)
+
+def distrito(request, pk):
+    response = requests.get(API+"resumen", params={})
+    if response.status_code == 200:
+        response = response.json()
+    for item in response:
+        for item2 in item['ubicaciones']:
+            if str(item2['id']) == str(pk):
+                distrito = Distrito(item2['id'], item2['distrito'], item['ciudad'], item['calidadAVG'], item2['datos'])
+    serializer = DatosDistritoSerializer(distrito)
     return JSONResponse(serializer.data)
 
 def humedad(request):

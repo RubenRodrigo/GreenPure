@@ -50,60 +50,22 @@ def crearArregloResumen(latitud, longitud, calidadAVG, hora, humedad, temperatur
     datoResumido = DatoResumido(idDato, fecha, pais, ciudad, calidad, elementosDato)
     return datoResumido
 
-def correccionOrientacionResumen(datosResumidos, paisesCiudades, distritos):
-    #Corrección de datos repetidos de primer nivel
-    listaRevisada = []
-    resumenNivel1 = []
-    for item in datosResumidos:
-        if str(item.pais + item.ciudad) not in listaRevisada:
-            listaRevisada.append(str(item.pais + item.ciudad))
-            resumenNivel1.append(item)
-    #Corrección de datos repetidos de segundo nivel
-    listaRevisada = []
-    resumenNivel2 = []
-    newResumenUbicaciones = []
-    for item in resumenNivel1:
-        for item2 in item.ubicaciones:
-            if item2.distrito not in listaRevisada:
-                listaRevisada.append(item2.distrito)
-                resumenNivel2.append(item2)
-        newResumenUbicaciones.append(DatoResumido(item.id, item.fecha, item.pais, item.ciudad, item.calidadAVG, resumenNivel2))
-    #Orientación de datos de tercer nivel
+def correccionOrientacionResumen(datosResumidos, paisesCiudades, distritos, datosDistrito):
     resumenNivel3 = []
-    newResumenDatos = []
-    resumenParcial = []
-    for item in newResumenUbicaciones:
-        for item2 in item.ubicaciones:
-            contador=0
-            for item3 in item2.datos:
-                if item2.distrito == distritos[contador]:
-                    resumenNivel3.append(item3)
-                contador = contador + 1
-            newResumenDatos.append(ElementoResumido(item2.id, item2.distrito, resumenNivel3))
-            resumenNivel3 = []
-        resumenParcial.append(DatoResumido(item.id, item.fecha, item.pais, item.ciudad, item.calidadAVG, newResumenDatos))
-        newResumenDatos = []
-    #Orientación de datos de segundo nivel
     resumenNivel2 = []
     resumenFinal = []
-    for item in resumenParcial:
+    for item in datosResumidos:
         contador = 0
         for item2 in item.ubicaciones:
-            for item3 in item2.datos:
-                if item2.distrito == distritos[contador] and str(item.pais+item.ciudad) == paisesCiudades[contador]:
-                    resumenNivel2.append(item2)
-                contador = contador + 1
+            if item2.distrito == distritos[contador] and str(item.pais+item.ciudad) == paisesCiudades[contador]:
+                contador2 = 0
+                for item3 in item2.datos:
+                    if item2.distrito == datosDistrito[contador2]:
+                        resumenNivel3.append(item3)    
+                    contador2 = contador2 +1
+                resumenNivel2.append(ElementoResumido(item2.id, item2.distrito, resumenNivel3))
+                resumenNivel3 = []
+            contador = contador + 1
         resumenFinal.append(DatoResumido(item.id, item.fecha, item.pais, item.ciudad, item.calidadAVG, resumenNivel2))
         resumenNivel2 = []
-    #Corrección de datos repetidos por la orientacion
-    listaRevisada = []
-    resumenNivel2 = []
-    resumenFinalOrdenado = []
-    for item in resumenFinal:
-        for item2 in item.ubicaciones:
-            if item2.distrito not in listaRevisada:
-                listaRevisada.append(item2.distrito)
-                resumenNivel2.append(item2)
-        resumenFinalOrdenado.append(DatoResumido(item.id, item.fecha, item.pais, item.ciudad, item.calidadAVG, resumenNivel2))
-        resumenNivel2 = []
-    return resumenFinalOrdenado
+    return resumenFinal

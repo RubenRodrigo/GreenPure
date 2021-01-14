@@ -44,6 +44,14 @@ class DistritoAuxiliar:
         self.ciudadNombre = ciudadNombre
         self.calidad = calidad
 
+class Distrito:
+    def __init__(self, idDistrito, nombre, ciudadNombre, calidadAVG, datos):
+        self.idDistrito = idDistrito
+        self.nombre = nombre
+        self.ciudadNombre = ciudadNombre
+        self.calidadAVG = calidadAVG
+        self.datos = datos
+
 #Clase para funcionalidad con Arduino
 class DatoCalidad:
     def __init__(id, humedad, temperatura, calor, concentracion, latitud, longitud, sensorHumo, sensorMetano, fecha, calidad):
