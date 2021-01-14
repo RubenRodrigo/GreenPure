@@ -2,10 +2,13 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from .models import Datos
-from .serializers import *
 from django.shortcuts import render
 from geopy.geocoders import Nominatim
+import requests
+from .models import Datos
+from .serializers import *
+from .resumen import *
+from .clases import *
 
 class JSONResponse(HttpResponse):
     """
@@ -105,17 +108,11 @@ def resumen(request):
         fecha = str(dato.fecha)[:10]
         geolocator = Nominatim(user_agent="GreenPure")
         location = geolocator.reverse(str(dato.Latitud) + "," + str(dato.Longitud))
-        pais = location.raw['address']['country']
-        try:
-            ciudad = location.raw['address']['state']
-        except:
-            ciudad = str(pais+" - No disponible")
+        pais = obtenerPais(location, cont)
+        ciudad = obtenerCiudad(location, cont)
         paisesCiudades.append(pais+ciudad)
         #Segundo nivel de datos
-        try:
-            distrito = location.raw['address']['town']
-        except:
-            distrito = str(ciudad+".")
+        distrito = obtenerDistrito(location, cont)
         distritos.append(distrito)
         #Tercer nivel de datos
         calidad = 12
@@ -126,7 +123,7 @@ def resumen(request):
         concentracion = dato.Concentracion
         sensorHumo = dato.SensorHumo
         sensorMetano = dato.SensorMetano
-        #Creación del arreglo entero
+        #Arreglo con el resumen
         #Tercer nivel
         caracteristicasElemento = CaracteristicasElemento(dato.Latitud, dato.Longitud, calidad, hora, humedad, temperatura, calor, concentracion, sensorHumo, sensorMetano)
         caracteristicas.append(caracteristicasElemento)
@@ -134,64 +131,12 @@ def resumen(request):
         elementoResumido = ElementoResumido(distrito, caracteristicas)
         elementosDato.append(elementoResumido)
         #Primer nivel
-        datoResumido = DatoResumido(cont, fecha, pais, ciudad, 21, elementosDato)
+        datoResumido = DatoResumido(cont, fecha, pais, ciudad, 24, elementosDato)
         datosResumidos.append(datoResumido)
         if cont==len(datos):
-            #Corrección de datos repetidos de primer nivel
-            listaRevisada = []
-            resumenNivel1 = []
-            for item in datosResumidos:
-                if str(item.pais + item.ciudad) not in listaRevisada:
-                    listaRevisada.append(str(item.pais + item.ciudad))
-                    resumenNivel1.append(item)
-            #Corrección de datos repetidos de segundo nivel
-            listaRevisada = []
-            resumenNivel2 = []
-            newResumenUbicaciones = []
-            for item in resumenNivel1:
-                for item2 in item.ubicaciones:
-                    if item2.distrito not in listaRevisada:
-                        listaRevisada.append(item2.distrito)
-                        resumenNivel2.append(item2)
-                newResumenUbicaciones.append(DatoResumido(item.id, item.fecha, item.pais, item.ciudad, item.calidadAVG, resumenNivel2))
-            #Orientación de datos de tercer nivel
-            resumenNivel3 = []
-            newResumenDatos = []
-            for item in newResumenUbicaciones:
-                for item2 in item.ubicaciones:
-                    contador=0
-                    for item3 in item2.datos:
-                        if item2.distrito == distritos[contador]:
-                            resumenNivel3.append(item3)
-                        contador = contador + 1
-                    newResumenDatos.append(ElementoResumido(item2.distrito, resumenNivel3))
-                    resumenNivel3 = []
-                resumenParcial.append(DatoResumido(item.id, item.fecha, item.pais, item.ciudad, item.calidadAVG, newResumenDatos))
-                newResumenDatos = []
-            #Orientación de datos de segundo nivel
-            resumenNivel2 = []
-            for item in resumenParcial:
-                contador = 0
-                for item2 in item.ubicaciones:
-                    for item3 in item2.datos:
-                        if item2.distrito == distritos[contador] and str(item.pais+item.ciudad) == paisesCiudades[contador]:
-                            resumenNivel2.append(item2)
-                        contador = contador + 1
-                resumenFinal.append(DatoResumido(item.id, item.fecha, item.pais, item.ciudad, item.calidadAVG, resumenNivel2))
-                resumenNivel2 = []
-            #Corrección de datos repetidos por la orientacion
-            listaRevisada = []
-            resumenNivel2 = []
-            resumenFinalOrdenado = []
-            for item in resumenFinal:
-                for item2 in item.ubicaciones:
-                    if item2.distrito not in listaRevisada:
-                        listaRevisada.append(item2.distrito)
-                        resumenNivel2.append(item2)
-                resumenFinalOrdenado.append(DatoResumido(item.id, item.fecha, item.pais, item.ciudad, item.calidadAVG, resumenNivel2))
-                resumenNivel2 = []
+            resumenFinal = correccionOrientacionResumen(datosResumidos, paisesCiudades, distritos)
     #Serialización de datos
-    serializer = DatosResumenSerializer(resumenFinalOrdenado, many=True)
+    serializer = DatosResumenSerializer(resumenFinal, many=True)
     return JSONResponse(serializer.data)
 
 def humedad(request):
