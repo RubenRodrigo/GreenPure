@@ -6,4 +6,5 @@ urlpatterns = [
     url(r'^dato/(?P<pk>[0-9]+)/$', views.Dato_detail),
     url('respuesta', views.humedad, name='respuesta'),
     url('resumen', views.resumen, name='resumen'),
+    url('ciudades', views.ciudades, name='ciudades'),
 ]
