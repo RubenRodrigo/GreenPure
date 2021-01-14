@@ -7,4 +7,5 @@ urlpatterns = [
     url('respuesta', views.humedad, name='respuesta'),
     url('resumen', views.resumen, name='resumen'),
     url('ciudades', views.ciudades, name='ciudades'),
+    url(r'^distrito/(?P<pk>[0-9]+)/$', views.distrito),
 ]

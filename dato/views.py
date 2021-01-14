@@ -103,7 +103,7 @@ def resumen(request):
         caracteristicasElemento = CaracteristicasElemento(dato.Latitud, dato.Longitud, calidad, hora, humedad, temperatura, calor, concentracion, sensorHumo, sensorMetano)
         caracteristicas.append(caracteristicasElemento)
         #Segundo nivel
-        elementoResumido = ElementoResumido(distrito, caracteristicas)
+        elementoResumido = ElementoResumido(cont, distrito, caracteristicas)
         elementosDato.append(elementoResumido)
         #Primer nivel
         datoResumido = DatoResumido(cont, fecha, pais, ciudad, 24, elementosDato)
@@ -123,6 +123,20 @@ def ciudades(request):
         ciudad = Ciudad(item['id'], item['ciudad'])
         ciudadesLista.append(ciudad)
     serializer = CiudadesSerializer(ciudadesLista, many=True)
+    return JSONResponse(serializer.data)
+
+def distrito(request, pk):
+    response = requests.get(API+"resumen", params={})
+    if response.status_code == 200:
+        response = response.json()
+    for item in response:
+        if str(item['id']) == str(pk):
+            distritos = []
+            for item2 in item['ubicaciones']:
+                distritoAuxiliar = DistritoAuxiliar(item2['id'],item2['distrito'],item['ciudad'],item['calidadAVG'])
+                distritos.append(distritoAuxiliar)
+            ciudadDistritos = CiudadDistritos(item['id'], item['ciudad'],distritos)
+    serializer = CiudadesDistritosSerializer(ciudadDistritos)
     return JSONResponse(serializer.data)
 
 def humedad(request):

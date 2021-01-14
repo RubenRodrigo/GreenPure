@@ -79,7 +79,7 @@ def correccionOrientacionResumen(datosResumidos, paisesCiudades, distritos):
                 if item2.distrito == distritos[contador]:
                     resumenNivel3.append(item3)
                 contador = contador + 1
-            newResumenDatos.append(ElementoResumido(item2.distrito, resumenNivel3))
+            newResumenDatos.append(ElementoResumido(item2.id, item2.distrito, resumenNivel3))
             resumenNivel3 = []
         resumenParcial.append(DatoResumido(item.id, item.fecha, item.pais, item.ciudad, item.calidadAVG, newResumenDatos))
         newResumenDatos = []
