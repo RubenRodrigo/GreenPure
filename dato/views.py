@@ -125,7 +125,7 @@ def ciudades(request):
     serializer = CiudadesSerializer(ciudadesLista, many=True)
     return JSONResponse(serializer.data)
 
-def distrito(request, pk):
+def ciudad(request, pk):
     response = requests.get(API+"resumen", params={})
     if response.status_code == 200:
         response = response.json()
@@ -137,6 +137,17 @@ def distrito(request, pk):
                 distritos.append(distritoAuxiliar)
             ciudadDistritos = CiudadDistritos(item['id'], item['ciudad'],distritos)
     serializer = CiudadesDistritosSerializer(ciudadDistritos)
+    return JSONResponse(serializer.data)
+
+def distrito(request, pk):
+    response = requests.get(API+"resumen", params={})
+    if response.status_code == 200:
+        response = response.json()
+    for item in response:
+        for item2 in item['ubicaciones']:
+            if str(item2['id']) == str(pk):
+                distrito = Distrito(item2['id'], item2['distrito'], item['ciudad'], item['calidadAVG'], item2['datos'])
+    serializer = DatosDistritoSerializer(distrito)
     return JSONResponse(serializer.data)
 
 def humedad(request):

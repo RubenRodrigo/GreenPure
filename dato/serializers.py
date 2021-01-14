@@ -70,3 +70,12 @@ class CiudadesDistritosSerializer(serializers.Serializer):
     distritos = serializers.ListField(
         child = DistritoAuxiliarSerializer()
     )
+
+class DatosDistritoSerializer(serializers.Serializer):
+    idDistrito = serializers.IntegerField()
+    nombre = serializers.CharField(max_length=100)
+    ciudadNombre = serializers.CharField(max_length=100)
+    calidadAVG = serializers.IntegerField()
+    datos = serializers.ListField(
+        child = CaracteristicasSerializer()
+    )
