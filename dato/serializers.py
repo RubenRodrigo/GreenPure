@@ -23,6 +23,7 @@ class DatosSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+#Serializadores para función resumen
 class CaracteristicasSerializer(serializers.Serializer):
     latitud = serializers.DecimalField(max_digits=10, decimal_places=7, default=0)
     longitud = serializers.DecimalField(max_digits=10, decimal_places=7, default=0)
@@ -36,6 +37,7 @@ class CaracteristicasSerializer(serializers.Serializer):
     sensorMetano = serializers.BooleanField()
 
 class ElementosSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
     distrito = serializers.CharField(max_length=100)
     datos = serializers.ListField(
         child=CaracteristicasSerializer()
@@ -51,6 +53,20 @@ class DatosResumenSerializer(serializers.Serializer):
         child=ElementosSerializer()
     )
 
+#Serializadores para funciones de respuesta específica
 class CiudadesSerializer(serializers.Serializer):
     idCiudad = serializers.IntegerField()
     nombre = serializers.CharField(max_length=100)
+
+class DistritoAuxiliarSerializer(serializers.Serializer):
+    idDistrito = serializers.IntegerField()
+    nombre = serializers.CharField(max_length=100)
+    ciudadNombre = serializers.CharField(max_length=100)
+    calidad = serializers.IntegerField()
+
+class CiudadesDistritosSerializer(serializers.Serializer):
+    idCiudad = serializers.IntegerField()
+    nombre = serializers.CharField(max_length=100)
+    distritos = serializers.ListField(
+        child = DistritoAuxiliarSerializer()
+    )

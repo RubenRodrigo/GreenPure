@@ -8,7 +8,8 @@ class DatoResumido:
         self.calidadAVG = calidadAVG
         self.ubicaciones = ubicaciones
 class ElementoResumido:
-    def __init__(self, distrito, datos):
+    def __init__(self, id, distrito, datos):
+        self.id = id
         self.distrito = distrito
         self.datos = datos
 class CaracteristicasElemento:
@@ -24,11 +25,24 @@ class CaracteristicasElemento:
         self.sensorHumo = sensorHumo
         self.sensorMetano = sensorMetano
     
-#Clase para funcionalidad Paises
+#Clases para funcionalidad de datos enfocados
 class Ciudad:
     def __init__(self, idCiudad, nombre):
         self.idCiudad = idCiudad
         self.nombre = nombre
+
+class CiudadDistritos:
+    def __init__(self, idCiudad, nombre, distritos):
+        self.idCiudad = idCiudad
+        self.nombre = nombre
+        self.distritos = distritos
+
+class DistritoAuxiliar:
+    def __init__(self, idDistrito, nombre, ciudadNombre, calidad):
+        self.idDistrito = idDistrito
+        self.nombre = nombre
+        self.ciudadNombre = ciudadNombre
+        self.calidad = calidad
 
 #Clase para funcionalidad con Arduino
 class DatoCalidad:
