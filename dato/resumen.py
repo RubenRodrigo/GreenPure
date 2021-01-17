@@ -36,20 +36,6 @@ def obtenerDistrito(location, id):
     return distrito
 
 #Métodos de resumen
-def crearArregloResumen(latitud, longitud, calidadAVG, hora, humedad, temperatura, calor, concentracion, sensorHumo, sensorMetano, distrito, idDato, fecha, pais, ciudad, calidad):    
-    #Listas para receptar los objetos resumidos
-    elementosDato = []
-    caracteristicas = []
-    #Tercer nivel
-    caracteristicasElemento = CaracteristicasElemento(latitud, longitud, calidadAVG, hora, humedad, temperatura, calor, concentracion, sensorHumo, sensorMetano)
-    caracteristicas.append(caracteristicasElemento)
-    #Segundo nivel
-    elementoResumido = ElementoResumido(distrito, caracteristicas)
-    elementosDato.append(elementoResumido)
-    #Primer nivel
-    datoResumido = DatoResumido(idDato, fecha, pais, ciudad, calidad, elementosDato)
-    return datoResumido
-
 def correccionOrientacionResumen(datosResumidos, paisesCiudades, distritos, datosDistrito):
     resumenNivel3 = []
     resumenNivel2 = []
@@ -66,6 +52,6 @@ def correccionOrientacionResumen(datosResumidos, paisesCiudades, distritos, dato
                 resumenNivel2.append(ElementoResumido(item2.id, item2.distrito, resumenNivel3))
                 resumenNivel3 = []
             contador = contador + 1
-        resumenFinal.append(DatoResumido(item.id, item.fecha, item.pais, item.ciudad, item.calidadAVG, resumenNivel2))
+        resumenFinal.append(DatoResumido(item.id, item.pais, item.ciudad, item.calidadAVG, resumenNivel2))
         resumenNivel2 = []
     return resumenFinal
