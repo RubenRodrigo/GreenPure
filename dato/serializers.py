@@ -25,9 +25,10 @@ class DatosSerializer(serializers.ModelSerializer):
 
 #Serializadores para función resumen
 class CaracteristicasSerializer(serializers.Serializer):
-    latitud = serializers.DecimalField(max_digits=10, decimal_places=7, default=0)
-    longitud = serializers.DecimalField(max_digits=10, decimal_places=7, default=0)
+    latitud = serializers.DecimalField(max_digits=12, decimal_places=7, default=0)
+    longitud = serializers.DecimalField(max_digits=12, decimal_places=7, default=0)
     calidad = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
+    fecha = serializers.DateField()
     hora = serializers.TimeField()
     humedad = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
     temperatura = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
@@ -45,7 +46,6 @@ class ElementosSerializer(serializers.Serializer):
 
 class DatosResumenSerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    fecha = serializers.DateField()
     pais = serializers.CharField(max_length=100)
     ciudad = serializers.CharField(max_length=100)
     calidadAVG = serializers.IntegerField()
@@ -79,3 +79,40 @@ class DatosDistritoSerializer(serializers.Serializer):
     datos = serializers.ListField(
         child = CaracteristicasSerializer()
     )
+    
+class DistritosDatosSerializer(serializers.Serializer):
+    idDistrito = serializers.IntegerField()
+    ciudad = serializers.CharField(max_length=100)
+    distrito = serializers.CharField(max_length=100)
+    humedad = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
+    temperatura = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
+    fecha = serializers.DateField()
+    hora = serializers.TimeField()
+    calidadAVG = serializers.IntegerField()
+
+class DistritosMapaSerializer(serializers.Serializer):
+    idDistrito = serializers.IntegerField()
+    ciudad = serializers.CharField(max_length=100)
+    distrito = serializers.CharField(max_length=100)
+    latitud = serializers.DecimalField(max_digits=12, decimal_places=7, default=0)
+    longitud = serializers.DecimalField(max_digits=12, decimal_places=7, default=0)
+    humedad = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
+    temperatura = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
+    fecha = serializers.DateField()
+    hora = serializers.TimeField()
+    calidadAVG = serializers.IntegerField()
+
+#Serializadores para actuador Arduino
+class DatoCalidadSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    humedad = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
+    temperatura = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
+    calor = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
+    concentracion = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
+    latitud = serializers.DecimalField(max_digits=12, decimal_places=7, default=0)
+    longitud = serializers.DecimalField(max_digits=12, decimal_places=7, default=0)
+    calidad = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
+    sensorHumo = serializers.BooleanField()
+    sensorMetano = serializers.BooleanField()
+    fecha = serializers.CharField(max_length=100)
+    calidad = serializers.IntegerField()
