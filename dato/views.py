@@ -89,7 +89,7 @@ def resumen(request):
         datosDistrito.append(distrito)
         #Arreglo con el resumen
         #Tercer nivel
-        caracteristicasElemento = CaracteristicasElemento(dato.Latitud, dato.Longitud, 12, str(dato.fecha)[:10], str(dato.fecha)[11:19], dato.Humedad, dato.Temperatura, dato.Calor, dato.Concentracion, dato.SensorHumo, dato.SensorMetano)
+        caracteristicasElemento = CaracteristicasElemento(dato.Latitud, dato.Longitud, obtenerCalidad(dato),str(dato.fecha)[:10], str(dato.fecha)[11:19], dato.Humedad, dato.Temperatura, dato.Calor, dato.Concentracion, dato.SensorHumo, dato.SensorMetano)
         caracteristicas.append(caracteristicasElemento)
         #Segundo nivel
         if distrito in repetidos:
@@ -102,9 +102,10 @@ def resumen(request):
         #Primer nivel
         if pais+ciudad in repetidos:
             continue
-        datoResumido = DatoResumido(cont, pais, ciudad, 24, elementosDato)
+        datoResumido = DatoResumido(cont, pais, ciudad, 0, elementosDato)
         datosResumidos.append(datoResumido)
         repetidos.append(pais+ciudad)
+        calidades = []
     resumenFinal = correccionOrientacionResumen(datosResumidos, paisesCiudades, distritos, datosDistrito)
     #Serialización de datos
     serializer = DatosResumenSerializer(resumenFinal, many=True)
