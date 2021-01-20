@@ -5,12 +5,11 @@ from rest_framework.parsers import JSONParser
 from django.shortcuts import render
 from geopy.geocoders import Nominatim
 import requests
-from .models import Datos
+from .models import *
+from .models import Distrito as DistritoModel
 from .serializers import *
-from .resumen import *
+from .funciones import *
 from .clases import *
-#Variable de la IP de la API a consumir
-API = "http://54.157.137.57/" 
 
 class JSONResponse(HttpResponse):
     """
@@ -65,106 +64,58 @@ def Dato_detail(request, pk):
         return HttpResponse(status=204)
 
 def resumen(request):
-    datos = Datos.objects.all()
-    #Listas para receptar los objetos resumidos
-    datosResumidos = []
-    elementosDato = []
-    caracteristicas = []
-    resumenFinal = []
-    #Listas para guardar variables de orientación de datos
-    distritos = []
-    paisesCiudades = []
-    datosDistrito = []
-    repetidos = []
-    #Variable contador
-    cont = 0
-    for dato in datos:  
-        cont = cont+1
-        #Datos de ubicación
-        geolocator = Nominatim(user_agent="GreenPure")
-        location = geolocator.reverse(str(dato.Latitud) + "," + str(dato.Longitud))
-        pais = obtenerPais(location, cont)
-        ciudad = obtenerCiudad(location, cont)
-        distrito = obtenerDistrito(location, cont)
-        datosDistrito.append(distrito)
-        #Arreglo con el resumen
-        #Tercer nivel
-        caracteristicasElemento = CaracteristicasElemento(dato.Latitud, dato.Longitud, obtenerCalidad(dato),str(dato.fecha)[:10], str(dato.fecha)[11:19], dato.Humedad, dato.Temperatura, dato.Calor, dato.Concentracion, dato.SensorHumo, dato.SensorMetano)
-        caracteristicas.append(caracteristicasElemento)
-        #Segundo nivel
-        if distrito in repetidos:
-            continue
-        elementoResumido = ElementoResumido(cont, distrito, caracteristicas)
-        elementosDato.append(elementoResumido)
-        repetidos.append(distrito)
-        distritos.append(distrito)
-        paisesCiudades.append(pais+ciudad)
-        #Primer nivel
-        if pais+ciudad in repetidos:
-            continue
-        datoResumido = DatoResumido(cont, pais, ciudad, 0, elementosDato)
-        datosResumidos.append(datoResumido)
-        repetidos.append(pais+ciudad)
-        calidades = []
-    resumenFinal = correccionOrientacionResumen(datosResumidos, paisesCiudades, distritos, datosDistrito)
-    #Serialización de datos
-    serializer = DatosResumenSerializer(resumenFinal, many=True)
-    return JSONResponse(serializer.data)
+    if request.method == 'GET':
+        resumen = Pais.objects.all()
+        serializer = PaisSerializer(resumen, many=True)
+        return JSONResponse(serializer.data)
 
 def ciudad(request, pk):
-    response = requests.get(API+"resumen", params={})
-    if response.status_code == 200:
-        response = response.json()
-    for item in response:
-        if str(item['id']) == str(pk):
-            distritos = []
-            for item2 in item['ubicaciones']:
-                distritoAuxiliar = DistritoAuxiliar(item2['id'],item2['distrito'],item['ciudad'],item['calidadAVG'])
-                distritos.append(distritoAuxiliar)
-            ciudadDistritos = CiudadDistritos(item['id'], item['ciudad'],distritos)
+    resumen = Pais.objects.get(pk=pk)
+    ubicaciones = DistritoModel.objects.filter(pais=resumen.id)
+    distritos = []
+    for item2 in ubicaciones:
+        distritoAuxiliar = DistritoAuxiliar(item2.id,item2.distrito,resumen.ciudad,resumen.calidadAVG)
+        distritos.append(distritoAuxiliar)
+    ciudadDistritos = CiudadDistritos(resumen.id, resumen.ciudad,distritos)
     serializer = CiudadesDistritosSerializer(ciudadDistritos)
     return JSONResponse(serializer.data)
 
 def ciudades(request):
-    response = requests.get(API+"resumen", params={})
-
-    if response.status_code == 200:
-        response = response.json()
-
+    resumen = Pais.objects.all()
     ciudadesLista = []
-    for item in response:
-        ciudad = Ciudad(item['id'], item['ciudad'])
+    for item in resumen:
+        ciudad = Ciudad(item.id, item.ciudad)
         ciudadesLista.append(ciudad)
     serializer = CiudadesSerializer(ciudadesLista, many=True)
     return JSONResponse(serializer.data)
 
 def distritoDatos(request, pk):
-    response = requests.get(API+"resumen", params={})
-    if response.status_code == 200:
-        response = response.json()
-    for item in response:
-        for item2 in item['ubicaciones']:
-            if str(item2['id']) == str(pk):
-                distrito = Distrito(item2['id'], item2['distrito'], item['ciudad'], item['calidadAVG'], item2['datos'])
+    resumen = Pais.objects.all()
+    for item in resumen:
+        ubicaciones = DistritoModel.objects.filter(pais=item.id)
+        for item2 in ubicaciones:
+            datos = Dato.objects.filter(distrito=item2.id)
+            if str(item2.id) == str(pk):
+                distrito = Distrito(item2.id, item2.distrito, item.ciudad, item.calidadAVG, datos)
     serializer = DatosDistritoSerializer(distrito)
     return JSONResponse(serializer.data)
 
 def distritos(request):
-    response = requests.get(API+"resumen", params={})
-
-    if response.status_code == 200:
-        response = response.json()
-
+    resumen = Pais.objects.all()
     if request.GET.get('id_distrito1', -1) == -1:
         distritosLista = []
-        cont = len(response)
-        for item in response:
-            if cont <= 4:
-                item2 = item['ubicaciones'][len(item['ubicaciones'])-1]
-                item3 = item2['datos'][len(item2['datos'])-1]
-                distritoEnfocado = DistritoEnfocado(item2['id'], item['ciudad'], item2['distrito'], item3['humedad'], item3['temperatura'], item3['concentracion'], item3['hora'], item3['fecha'], item['calidadAVG'])
-                distritosLista.append(distritoEnfocado)
-            cont -= 1
+        cont = 0
+        for item in resumen:
+            ubicaciones = DistritoModel.objects.filter(pais=item.id)
+            for item2 in ubicaciones:
+                if cont < 4:
+                    #Colocando el último dato
+                    item3 = Dato.objects.filter(distrito=item2.id).last()
+                    distritoEnfocado = DistritoEnfocado(item2.id, item.ciudad, item2.distrito, item3.humedad, item3.temperatura, item3.concentracion, item3.hora, item3.fecha, item.calidadAVG)
+                    distritosLista.append(distritoEnfocado)
+                else:
+                    break
+                cont += 1
         serializer = DistritosDatosSerializer(distritosLista, many=True)
         return JSONResponse(serializer.data)
     else:
@@ -175,37 +126,35 @@ def distritos(request):
             id_distrito = request.GET.get('id_distrito'+str(cont))
             idsDistritos.append(id_distrito)
             cont += 1
-        for item in response:
-            if str(item['id']) in idsDistritos:
-                item2 = item['ubicaciones'][len(item['ubicaciones'])-1]
-                item3 = item2['datos'][len(item2['datos'])-1]
-                distritoEnfocado = DistritoEnfocado(item['id'], item['ciudad'], item2['distrito'], item3['humedad'], item3['temperatura'], item3['concentracion'], item3['hora'], item3['fecha'], item['calidadAVG'])
-                distritosLista.append(distritoEnfocado)
+        for item in resumen:
+            ubicaciones = DistritoModel.objects.filter(pais=item.id)
+            for item2 in ubicaciones:
+                if str(item2.id) in idsDistritos:
+                    item3 = Dato.objects.filter(distrito=item2.id).last()
+                    distritoEnfocado = DistritoEnfocado(item2.id, item.ciudad, item2.distrito, item3.humedad, item3.temperatura, item3.concentracion, item3.hora, item3.fecha, item.calidadAVG)
+                    distritosLista.append(distritoEnfocado)
         serializer = DistritosDatosSerializer(distritosLista, many=True)
         return JSONResponse(serializer.data)
 
 def distritosMapa(request):
-    response = requests.get(API+"resumen", params={})
-    
-    if response.status_code == 200:
-        response = response.json()
-
+    resumen = Pais.objects.all()
     distritosLista = []
-    for item in response:
-        item2 = item['ubicaciones'][len(item['ubicaciones'])-1]
-        item3 = item2['datos'][len(item2['datos'])-1]
-        distritoMapa = DistritoMapa(item2['id'], item['ciudad'], item2['distrito'], item3['latitud'], item3['longitud'], item3['humedad'], item3['temperatura'], item3['concentracion'], item3['hora'], item3['fecha'], item['calidadAVG'])
-        distritosLista.append(distritoMapa)
+    for item in resumen:
+        ubicaciones = DistritoModel.objects.filter(pais=item.id)
+        for item2 in ubicaciones:
+            item3 = Dato.objects.filter(distrito=item2.id).last()
+            distritoMapa = DistritoMapa(item2.id, item.ciudad, item2.distrito, item3.latitud, item3.longitud,item3.humedad, item3.temperatura, item3.concentracion, item3.hora, item3.fecha, item.calidadAVG)
+            distritosLista.append(distritoMapa)
     serializer = DistritosMapaSerializer(distritosLista, many=True)
     return JSONResponse(serializer.data)
 
 def inscribir(request):
     dato = Datos.objects.last()
-    datoCalidad = DatoCalidad(dato.id, dato.Humedad, dato.Temperatura, dato.Calor, dato.Concentracion, dato.Latitud, dato.Longitud, dato.SensorHumo, dato.SensorMetano, dato.fecha, 15)
+    datoCalidad = DatoCalidad(dato.id, dato.Humedad, dato.Temperatura, dato.Calor, dato.Concentracion, dato.Latitud, dato.Longitud, dato.SensorHumo, dato.SensorMetano, dato.fecha, obtenerCalidad(dato))
     serializer = DatoCalidadSerializer(datoCalidad)
     return JSONResponse(serializer.data)
 
-def humedad(request):
+def respuesta(request):
     elementos = Datos.objects.all()
     context = {
         "elementos": elementos
