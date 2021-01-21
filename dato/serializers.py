@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Datos
+from .models import *
 
 
 class DatosSerializer(serializers.ModelSerializer):
@@ -23,11 +23,11 @@ class DatosSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-#Serializadores para función resumen
+#Serializadores para funciones de respuesta específica
 class CaracteristicasSerializer(serializers.Serializer):
     latitud = serializers.DecimalField(max_digits=12, decimal_places=7, default=0)
     longitud = serializers.DecimalField(max_digits=12, decimal_places=7, default=0)
-    calidad = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
+    calidad = serializers.IntegerField()
     fecha = serializers.DateField()
     hora = serializers.TimeField()
     humedad = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
@@ -36,24 +36,7 @@ class CaracteristicasSerializer(serializers.Serializer):
     concentracion = serializers.DecimalField(max_digits=6, decimal_places=2, default=0)
     sensorHumo = serializers.BooleanField()
     sensorMetano = serializers.BooleanField()
-
-class ElementosSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    distrito = serializers.CharField(max_length=100)
-    datos = serializers.ListField(
-        child=CaracteristicasSerializer()
-    )
-
-class DatosResumenSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    pais = serializers.CharField(max_length=100)
-    ciudad = serializers.CharField(max_length=100)
-    calidadAVG = serializers.IntegerField()
-    ubicaciones = serializers.ListField(
-        child=ElementosSerializer()
-    )
-
-#Serializadores para funciones de respuesta específica
+    
 class CiudadesSerializer(serializers.Serializer):
     idCiudad = serializers.IntegerField()
     nombre = serializers.CharField(max_length=100)
@@ -116,3 +99,21 @@ class DatoCalidadSerializer(serializers.Serializer):
     sensorMetano = serializers.BooleanField()
     fecha = serializers.CharField(max_length=100)
     calidad = serializers.IntegerField()
+
+#Serializadores para resumen de datos
+class DatoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dato
+        fields = ('latitud', 'longitud', 'calidad', 'fecha', 'hora', 'humedad', 'temperatura', 'calor', 'concentracion', 'sensorHumo', 'sensorMetano')
+
+class DistritoSerializer(serializers.ModelSerializer):
+    datos = DatoSerializer(many=True, read_only=True)
+    class Meta:
+        model = Distrito
+        fields = ('id' ,'distrito', 'datos')
+
+class PaisSerializer(serializers.ModelSerializer):
+    ubicaciones = DistritoSerializer(many=True, read_only=True)
+    class Meta:
+        model = Pais
+        fields = ('id', 'pais', 'ciudad', 'calidadAVG', 'ubicaciones')
