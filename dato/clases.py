@@ -75,7 +75,7 @@ class Distrito:
 
 #Clase para funcionalidad con Arduino
 class DatoCalidad:
-    def __init__(id, humedad, temperatura, calor, concentracion, latitud, longitud, sensorHumo, sensorMetano, fecha, calidad):
+    def __init__(self, id, humedad, temperatura, calor, concentracion, latitud, longitud, sensorHumo, sensorMetano, fecha, calidad):
         self.id = id
         self.humedad = humedad
         self.temperatura = temperatura
