@@ -4,3 +4,4 @@ dato/migrations/
 venv/
 .vscode/
 *.sqlite3
+myvenv/
