@@ -1,4 +1,6 @@
-dato/__pycache__/
-GreenPure/__pycache__/
+__pycache__/
 static/
 dato/migrations/
+venv/
+.vscode/
+*.sqlite3
