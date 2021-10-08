@@ -80,7 +80,6 @@ WSGI_APPLICATION = 'GreenPure.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 # Use This configuration if you're using SQLite
-'''
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -100,6 +99,7 @@ DATABASES = {
         'PORT': '',
     }
 }
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators

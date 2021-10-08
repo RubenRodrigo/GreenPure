@@ -2,3 +2,5 @@ dato/__pycache__/
 GreenPure/__pycache__/
 static/
 dato/migrations/
+db.sqlite3
+myvenv/
