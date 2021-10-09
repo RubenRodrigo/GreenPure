@@ -9,3 +9,8 @@ from device.serializer import DeviceSerializer
 class DeviceList(generics.ListCreateAPIView):
     queryset = Device.objects.all()
     serializer_class = DeviceSerializer
+
+
+class DeviceDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Device.objects.all()
+    serializer_class = DeviceSerializer

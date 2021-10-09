@@ -2,7 +2,7 @@ from django.db import models
 from geopy.geocoders import Nominatim
 
 from device.models import Device
-from .funciones import *
+from .utils import *
 
 # Create your models here.
 
@@ -13,6 +13,12 @@ class Country(models.Model):
     def __str__(self):
         return self.country
 
+    @property
+    def qualityAVG(self):
+        data_item = self.city.all()
+        total = sum([item.qualityAVG for item in data_item])
+        return total
+
 
 class City(models.Model):
     city = models.CharField(max_length=100)
@@ -21,6 +27,12 @@ class City(models.Model):
 
     def __str__(self):
         return self.city
+
+    @property
+    def qualityAVG(self):
+        data_item = self.district.all()
+        total = sum([item.qualityAVG for item in data_item])
+        return total
 
 
 class District(models.Model):
@@ -31,6 +43,12 @@ class District(models.Model):
     def __str__(self):
         return self.district
 
+    @property
+    def qualityAVG(self):
+        data_item = self.data.all()
+        total = sum([item.quality for item in data_item])
+        return total
+
 
 class Data(models.Model):
     district_id = models.ForeignKey(
@@ -39,7 +57,7 @@ class Data(models.Model):
         Device, related_name='data', on_delete=models.CASCADE, null=True, blank=True)
     latitude = models.DecimalField(max_digits=10, decimal_places=7, default=0)
     longitude = models.DecimalField(max_digits=10, decimal_places=7, default=0)
-    quality = models.IntegerField()
+    quality = models.IntegerField(default=0)
     date = models.DateField('Date')
     time = models.TimeField('Time')
     humidity = models.DecimalField(max_digits=6, decimal_places=2, default=0)
@@ -54,50 +72,6 @@ class Data(models.Model):
     def __str__(self):
         return str(self.quality)
 
-
-# class Datos(models.Model):
-#     Humedad = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-#     Temperatura = models.DecimalField(
-#         max_digits=6, decimal_places=2, default=0)
-#     Calor = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-#     Concentracion = models.DecimalField(
-#         max_digits=6, decimal_places=2, default=0)
-#     Latitud = models.DecimalField(max_digits=10, decimal_places=7, default=0)
-#     Longitud = models.DecimalField(max_digits=10, decimal_places=7, default=0)
-#     SensorHumo = models.BooleanField(default=False)
-#     SensorMetano = models.BooleanField(default=False)
-#     fecha = models.DateTimeField('Fecha y hora')
-
-#     def save(self, *args, **kwargs):
-#         geolocator = Nominatim(user_agent="GreenPure")
-#         location = geolocator.reverse(
-#             str(self.Latitud) + "," + str(self.Longitud))
-#         pais = obtenerPais(location, self.id)
-#         ciudad = obtenerCiudad(location, self.id)
-#         distrito = obtenerDistrito(location, self.id)
-#         super().save(*args, **kwargs)
-
-#         try:
-#             Pais.objects.filter(pais=pais).get(ciudad=ciudad)
-#         except:
-#             Nivel1 = Pais(pais=pais, ciudad=ciudad, calidadAVG=0)
-#             Nivel1.save()
-#         try:
-#             Distrito.objects.get(distrito=distrito)
-#         except:
-#             Nivel2 = Distrito(pais=Pais.objects.get(
-#                 ciudad=ciudad), distrito=distrito)
-#             Nivel2.save()
-#         Nivel3 = Dato(distrito=Distrito.objects.get(distrito=distrito), latitud=self.Latitud, longitud=self.Longitud, calidad=obtenerCalidad(self), fecha=str(self.fecha)[:10], hora=str(
-#             self.fecha)[11:19], humedad=self.Humedad, temperatura=self.Temperatura, calor=self.Calor, concentracion=self.Concentracion, sensorHumo=self.SensorHumo, sensorMetano=self.SensorMetano)
-#         Nivel3.save()
-
-#         calidades = []
-#         Enfocado = Pais.objects.filter(pais=pais).get(ciudad=ciudad)
-#         distritos = Distrito.objects.filter(pais=Enfocado.id)
-#         for item in distritos:
-#             elementos = Dato.objects.filter(distrito=item.id)
-#             for item2 in elementos:
-#                 calidades.append(item2.calidad)
-#         Enfocado.calidadAVG = sum(calidades)/len(calidades)
-#         Enfocado.save()
+    def save(self, *args, **kwargs):
+        self.quality = getQuality(self)
+        return super(Data, self).save(*args, **kwargs)
