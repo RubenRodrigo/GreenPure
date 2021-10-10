@@ -1,0 +1,1 @@
+web: gunicorn GreenPure.wsgi --log-file -
