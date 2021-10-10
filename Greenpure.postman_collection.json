@@ -1,0 +1,171 @@
+{
+	"info": {
+		"_postman_id": "4ecf6ac1-8cca-4e70-a408-fe056359ce29",
+		"name": "Greenpure",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Sign in",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\":\"user1@gmail.com\",\n    \"password\":\"administrador_1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://greenpure-backend.herokuapp.com/api/token/",
+							"protocol": "https",
+							"host": [
+								"greenpure-backend",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"api",
+								"token",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sign out",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh_token\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYzNDIzMTc4NCwianRpIjoiODM4NjhiYzRhNDcyNGY3N2FiYjQ3ZThhMjEzYTgxMDUiLCJ1c2VyX2lkIjoyfQ.Q545LOco6I56UB2YcgqI2EdpjJzi6r2WFcKF-W7oXd0\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://greenpure-backend.herokuapp.com/user/signout/blacklist/",
+							"protocol": "https",
+							"host": [
+								"greenpure-backend",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"user",
+								"signout",
+								"blacklist",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjMzODAxMDQzLCJqdGkiOiIzYWMwNmRmMmZlOGI0MzBjYTg0YjBjNTI5MTc5Nzc4ZiIsInVzZXJfaWQiOjJ9.nvt5qcsdbJ0ffrGvVgZiTXAE3ZqiEyecMNQchzZF-mM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://greenpure-backend.herokuapp.com/user/2",
+							"protocol": "https",
+							"host": [
+								"greenpure-backend",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"user",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTYzNDIzMTc4NCwianRpIjoiODM4NjhiYzRhNDcyNGY3N2FiYjQ3ZThhMjEzYTgxMDUiLCJ1c2VyX2lkIjoyfQ.Q545LOco6I56UB2YcgqI2EdpjJzi6r2WFcKF-W7oXd0\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://greenpure-backend.herokuapp.com/api/token/refresh/",
+							"protocol": "https",
+							"host": [
+								"greenpure-backend",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"api",
+								"token",
+								"refresh",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin1@gmail.com\",\n    \"first_name\": \"Admin\",\n    \"last_name\": \"Admin admin\",\n    \"password\": \"administrador_1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://greenpure-backend.herokuapp.com/user/create/",
+							"protocol": "https",
+							"host": [
+								"greenpure-backend",
+								"herokuapp",
+								"com"
+							],
+							"path": [
+								"user",
+								"create",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
