@@ -5,3 +5,5 @@ venv/
 .vscode/
 *.sqlite3
 myvenv/
+
+.env
