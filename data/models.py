@@ -69,6 +69,14 @@ class Data(models.Model):
     smoke_sensor = models.BooleanField(default=False)
     methane_sensor = models.BooleanField(default=False)
 
+    @property
+    def difference_quality(self):
+        quality = self.quality
+        device = self.device_id
+        lastQuality = Data.objects.filter(
+            device_id=device).latest('date', 'time')
+        return lastQuality.quality
+
     def __str__(self):
         return str(self.quality)
 

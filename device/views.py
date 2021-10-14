@@ -1,8 +1,7 @@
-from rest_framework import generics
+from rest_framework import generics, permissions
 
 from device.models import Device
 from device.serializer import DeviceSerializer
-
 # Create your views here.
 
 
