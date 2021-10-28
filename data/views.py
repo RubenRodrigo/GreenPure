@@ -1,8 +1,11 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
+from django.utils import timezone
+from django.conf import settings
 
 from device.models import Device
+from utils import get_filter_by_date
 
 from .serializers import CitySerializer, CountrySerializer, DataSerializer, DistrictSerializer
 from .models import City, Country, Data, District
@@ -27,12 +30,14 @@ class DataList(generics.ListCreateAPIView, DataAccessPermission):
         """
         user = self.request.user
         device = self.request.query_params.get('device')
+        filter_by = self.request.query_params.get('filter_by')
+        time_threshold = get_filter_by_date(filter_by)
         if device is not None:
             obj = get_object_or_404(Device, pk=device)
             if obj.account_id == user:
-                return Data.objects.filter(device_id=obj)
+                return Data.objects.filter(device_id=obj, date_time__gt=time_threshold)
             raise PermissionDenied()
-        return Data.objects.filter(device_id__account_id=user)
+        return Data.objects.filter(device_id__account_id=user, date_time__gt=time_threshold)
 
 
 class DataDetail(generics.RetrieveUpdateDestroyAPIView):

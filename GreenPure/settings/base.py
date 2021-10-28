@@ -119,6 +119,8 @@ REST_FRAMEWORK = {
     ],
 }
 
+FILTER_OPTIONS = ['1', '6', '24', '168', '720']
+
 AUTHENTICATION_BACKENDS = (
     # Others auth providers (e.g. Google, OpenId, etc)
     # Facebook OAuth2

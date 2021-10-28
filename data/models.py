@@ -1,8 +1,8 @@
 from django.db import models
-from geopy.geocoders import Nominatim
+from django.utils import timezone
 
 from device.models import Device
-from .utils import *
+from utils import getQuality
 
 # Create your models here.
 
@@ -58,8 +58,8 @@ class Data(models.Model):
     latitude = models.DecimalField(max_digits=10, decimal_places=7, default=0)
     longitude = models.DecimalField(max_digits=10, decimal_places=7, default=0)
     quality = models.IntegerField(default=0)
-    date = models.DateField('Date')
-    time = models.TimeField('Time')
+    difference_quality = models.IntegerField(default=0)
+    date_time = models.DateTimeField('Date Time', null=True, blank=True)
     humidity = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     temperature = models.DecimalField(
         max_digits=6, decimal_places=2, default=0)
@@ -69,17 +69,14 @@ class Data(models.Model):
     smoke_sensor = models.BooleanField(default=False)
     methane_sensor = models.BooleanField(default=False)
 
-    @property
-    def difference_quality(self):
-        quality = self.quality
-        device = self.device_id
-        lastQuality = Data.objects.filter(
-            device_id=device).latest('date', 'time')
-        return lastQuality.quality
-
     def __str__(self):
         return str(self.quality)
 
     def save(self, *args, **kwargs):
         self.quality = getQuality(self)
+        lastQuality = Data.objects.filter(
+            device_id=self.device_id).latest('date_time')
+        self.difference_quality = self.quality - lastQuality.quality
+        if self.date_time is None:
+            self.date_time = timezone.now()
         return super(Data, self).save(*args, **kwargs)
