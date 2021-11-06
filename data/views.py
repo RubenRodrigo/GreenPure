@@ -1,8 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, permissions
-from django.utils import timezone
-from django.conf import settings
 
 from device.models import Device
 from utils import get_filter_by_date

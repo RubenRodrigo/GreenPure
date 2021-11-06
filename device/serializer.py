@@ -23,5 +23,6 @@ class DeviceSerializer(serializers.ModelSerializer):
             'account_id',
             'activation_date',
             'state',
-            'data_item'
+            'qr_code',
+            'data_item',
         ]
