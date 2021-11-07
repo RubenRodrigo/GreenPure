@@ -27,6 +27,16 @@ class DetailUser(generics.RetrieveUpdateDestroyAPIView, UserWritePermission):
     permission_classes = [IsAuthenticated, UserWritePermission]
 
 
+class DetailCurrent(generics.RetrieveAPIView, UserWritePermission):
+    """ View to get, update or destroy. This action is only allowed to the author only """
+    serializer_class = CustomUserSerializer
+    permission_classes = [IsAuthenticated, UserWritePermission]
+
+    def get_object(self):
+        user = self.request.user
+        return user
+
+
 class CustomAccountCreate(APIView):
     """ View to create a custom account. Only allow post request"""
     permission_classes = [AllowAny]

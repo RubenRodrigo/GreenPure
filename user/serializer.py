@@ -10,7 +10,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('email', 'first_name', 'last_name', 'password')
+        fields = ('id', 'email', 'first_name', 'last_name', 'password')
         extra_kwargs = {'password': {'write_only': True}}
 
     # Validate if existe one user with the same email

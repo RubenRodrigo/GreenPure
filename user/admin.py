@@ -3,6 +3,9 @@ from user.models import Account
 from django.contrib.auth.admin import UserAdmin
 from django.forms import Textarea
 from django.db import models
+from django.contrib.auth.forms import (
+    AdminPasswordChangeForm, UserChangeForm, UserCreationForm,
+)
 
 
 class UserAdminConfig(UserAdmin):
@@ -14,7 +17,7 @@ class UserAdminConfig(UserAdmin):
                     'is_active', 'is_staff')
     fieldsets = (
         (None, {'fields': ('email', 'first_name', 'last_name')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'password')}),
     )
     add_fieldsets = (
         (None, {
