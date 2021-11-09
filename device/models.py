@@ -45,3 +45,9 @@ class Device(models.Model):
             canvas.close()
 
         return super(Device, self).save(*args, **kwargs)
+
+    @property
+    def quality_AVG(self):
+        data_item = self.data.all()
+        total = sum([item.quality for item in data_item])
+        return total

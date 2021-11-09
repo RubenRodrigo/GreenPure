@@ -5,5 +5,5 @@ venv/
 .vscode/
 *.sqlite3
 myvenv/
-
+manage.py
 .env

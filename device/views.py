@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 
 from device.models import Device
-from device.serializer import DeviceSerializer
+from device.serializer import DeviceDetailSerializer, DeviceSerializer
 # Create your views here.
 
 
@@ -18,7 +18,7 @@ class DeviceUserWritePermission(BasePermission):
 
 
 class DeviceList(generics.ListCreateAPIView):
-    serializer_class = DeviceSerializer
+    serializer_class = DeviceDetailSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -31,8 +31,17 @@ class DeviceList(generics.ListCreateAPIView):
 
 class DeviceDetail(generics.RetrieveUpdateDestroyAPIView, DeviceUserWritePermission):
     queryset = Device.objects.all()
-    serializer_class = DeviceSerializer
+    serializer_class = DeviceDetailSerializer
     permission_classes = [IsAuthenticated, DeviceUserWritePermission]
+
+
+class DeviceResumeDetail(generics.ListAPIView):
+    serializer_class = DeviceSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Device.objects.filter(account_id=user)
 
 
 @api_view(['GET'])
