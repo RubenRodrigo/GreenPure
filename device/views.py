@@ -14,7 +14,7 @@ class DeviceUserWritePermission(BasePermission):
     message = 'Editing devices is restricted to the author only.'
 
     def has_object_permission(self, request, view, obj):
-        return obj.account_id == request.user
+        return obj.owner_id == request.user
 
 
 class DeviceList(generics.ListCreateAPIView):
@@ -23,10 +23,10 @@ class DeviceList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Device.objects.filter(account_id=user)
+        return Device.objects.filter(owner_id=user)
 
     def perform_create(self, serializer):
-        serializer.save(account_id=self.request.user)
+        serializer.save(owner_id=self.request.user)
 
 
 class DeviceDetail(generics.RetrieveUpdateDestroyAPIView, DeviceUserWritePermission):
@@ -41,16 +41,20 @@ class DeviceResumeDetail(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Device.objects.filter(account_id=user)
+        return Device.objects.filter(owner_id=user)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def deviceActivate(request, device):
+def deviceActivate(request, unique_id):
+    """
+    Receive an UUID, search the device and activates it  
+    """
     if request.method == 'GET':
         user = request.user
         device = generics.get_object_or_404(
-            Device, account_id=user, device=device)
+            Device, unique_id=unique_id)
         device.state = True
-        device.save(update_fields=['state'])
+        device.owner_id = user
+        device.save(update_fields=['state', 'owner_id'])
         return Response(status=status.HTTP_204_NO_CONTENT)

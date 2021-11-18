@@ -22,7 +22,7 @@ class DeviceDetailSerializer(serializers.ModelSerializer):
         concentration = ordered_queryset.aggregate(value=Avg('concentration'))
         averages = {
             "quality__avg": quality['value'],
-            "himidity__avg": humidity['value'],
+            "humidity__avg": humidity['value'],
             "temperature__avg": temperature['value'],
             "warm__avg": warm['value'],
             "concentration__avg": concentration['value'],
@@ -41,8 +41,10 @@ class DeviceDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'device',
-            'account_id',
+            'account_created_id',
+            'owner_id',
             'activation_date',
+            'unique_id',
             'state',
             'qr_code',
             'averages',
@@ -65,7 +67,7 @@ class DeviceSerializer(serializers.ModelSerializer):
         concentration = ordered_queryset.aggregate(value=Avg('concentration'))
         averages = {
             "quality__avg": quality['value'],
-            "himidity__avg": humidity['value'],
+            "humidity": humidity['value'],
             "temperature__avg": temperature['value'],
             "warm__avg": warm['value'],
             "concentration__avg": concentration['value'],
@@ -77,7 +79,9 @@ class DeviceSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'device',
-            'account_id',
+            'account_created_id',
+            'owner_id',
+            'unique_id',
             'activation_date',
             'state',
             'qr_code',

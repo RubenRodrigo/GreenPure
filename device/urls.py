@@ -7,5 +7,5 @@ urlpatterns = [
     url(r'^$', DeviceList.as_view()),
     url(r'^(?P<pk>[0-9]+)/$', DeviceDetail.as_view()),
     path('resume/', DeviceResumeDetail.as_view()),
-    path('activate/<str:device>/', deviceActivate),
+    path('activate/<str:unique_id>/', deviceActivate),
 ]

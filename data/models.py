@@ -74,9 +74,13 @@ class Data(models.Model):
 
     def save(self, *args, **kwargs):
         self.quality = getQuality(self)
-        lastQuality = Data.objects.filter(
-            device_id=self.device_id).latest('date_time')
-        self.difference_quality = self.quality - lastQuality.quality
+        lastDataByDevice = Data.objects.filter(
+            device_id=self.device_id)
+
+        if lastDataByDevice.exists():
+            lastQuality = lastDataByDevice.latest('date_time')
+            self.difference_quality = self.quality - lastQuality.quality
+
         if self.date_time is None:
             self.date_time = timezone.now()
         return super(Data, self).save(*args, **kwargs)

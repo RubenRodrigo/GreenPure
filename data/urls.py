@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from .views import CityDetail, CountryDetail, DataDetail, DataList, DistrictDetail
+from .views import CityDetail, CountryDetail, DataDetail, DataList, DataListAll, DistrictDetail
 
 urlpatterns = [
     url(r'^$', DataList.as_view()),
@@ -7,6 +7,8 @@ urlpatterns = [
     url(r'^country/(?P<pk>[0-9]+)/$', CountryDetail.as_view()),
     url(r'^city/(?P<pk>[0-9]+)/$', CityDetail.as_view()),
     url(r'^district/(?P<pk>[0-9]+)/$', DistrictDetail.as_view()),
+
+    url(r'^all/$', DataListAll.as_view()),
     # url(r'^dato/(?P<pk>[0-9]+)/$', views.Dato_detail),
     # url('respuesta', views.respuesta, name='respuesta'),
     # url('resumen', views.resumen, name='resumen'),
