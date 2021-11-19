@@ -84,3 +84,6 @@ class Data(models.Model):
         if self.date_time is None:
             self.date_time = timezone.now()
         return super(Data, self).save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['-date_time']
