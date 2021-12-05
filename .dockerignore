@@ -1,10 +1,11 @@
 __pycache__/
 static/
-dato/migrations/
 venv/
 .vscode/
 *.sqlite3
 myvenv/
-manage.py
-media/
 .env
+Arduino/
+media
+static
+*.json

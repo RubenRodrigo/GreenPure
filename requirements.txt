@@ -12,16 +12,13 @@ django-cors-headers==3.6.0
 django-dotenv==1.4.2
 django-oauth-toolkit==1.5.0
 djangorestframework==3.12.2
-djangorestframework-simplejwt==4.8.0
 drf-social-oauth2==1.0.9
-geographiclib==1.52
-geopy==2.1.0
 gunicorn==20.0.4
 idna==2.10
 jwcrypto==1.0
 oauthlib==3.1.1
 Pillow==8.4.0
-psycopg2-binary==2.8.6
+psycopg2==2.8.6
 pycodestyle==2.7.0
 pycparser==2.20
 PyJWT==2.2.0

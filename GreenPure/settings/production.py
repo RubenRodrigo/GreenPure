@@ -1,7 +1,7 @@
 from .base import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = int(os.environ.get("DEBUG", default=0))
 
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(" ")
 
@@ -17,8 +17,6 @@ DATABASES = {
 }
 
 CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOW').split(" ")
-
-SECURE_SSL_REDIRECT = True
 
 SESSION_COOKIE_SECURE = True
 
