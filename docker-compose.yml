@@ -1,20 +1,55 @@
-version: "3.8"
+version: "2"
 
 services:
   app:
-    build: .
+    image: xeduardox54/greenpure_backend
+    cpu_shares: 100
+    mem_limit: 1801440000
     command: python manage.py runserver 0.0.0.0:8000
     ports:
-      - 8000:8000
-    env_file:
-      - ./.env
-    depends_on:
+      - 80:8000
+    environment:
+      DEBUG: 1
+      DJANGO_SETTINGS_MODULE: "GreenPure.settings.production"
+      SECRET_KEY: secret
+      SECRET_ADMIN_URL: "admin/"
+      DJANGO_ALLOWED_HOSTS: localhost 34.200.216.164 139.162.113.11 backend.herokuapp.com [::1]
+      SQL_ENGINE: django.db.backends.postgresql
+      SQL_DATABASE: greenpure_django_prod
+      SQL_USER: greenpure_django
+      SQL_PASSWORD: greenpure_django
+      SQL_HOST: database-1.cpvpew4olxsy.us-east-1.rds.amazonaws.com
+      SQL_PORT: 5432
+      DATABASE: postgre
+      CORS_ALLOW: http://localhost:3000 https://frontend.vercel.app
+      FACEBOOK_KEY: 287541893209397
+      FACEBOOK_KEY_SECRET: d6b60f4fbc7ebcbd6d22d3fb1888dbee
+      IAM_USER_KEY: AKIAQ2AR6TH6WVCHFTTJ
+      IAM_USER_SECRET_KEY: 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
+      S3_BUCKET: greenpure-bucket
+    links:
       - db
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: greenpure-web
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: app
   db:
     image: postgres:12.0-alpine
+    cpu_shares: 100
+    mem_limit: 1801440000
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    env_file:
-      - ./.env.prod.db
+    environment:
+      POSTGRES_USER: greenpure_django
+      POSTGRES_PASSWORD: greenpure_django
+      POSTGRES_DB: greenpure_django_prod
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: greenpure-web
+        awslogs-region: us-east-1
+        awslogs-stream-prefix: db
 volumes:
   postgres_data: null

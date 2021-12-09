@@ -18,8 +18,11 @@ DATABASES = {
 
 CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOW').split(" ")
 
-SESSION_COOKIE_SECURE = True
+AWS_ACCESS_KEY_ID = os.environ.get('IAM_USER_KEY')
+AWS_SECRET_ACCESS_KEY = os.environ.get('IAM_USER_SECRET_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('S3_BUCKET')
 
-CSRF_COOKIE_SECURE = True
-
-SECURE_BROWSER_XSS_FILTER = True
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+#STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
